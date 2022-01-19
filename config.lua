@@ -5,6 +5,10 @@ lvim.colorscheme = "onedarker"
 
 lvim.leader = "space"
 vim.cmd("nnoremap . <Nop>")
+vim.cmd("nnoremap ∆ <c-w>-")
+vim.cmd("nnoremap ˚ <c-w>+")
+vim.cmd("nnoremap ˙ <c-w><")
+vim.cmd("nnoremap ¬ <c-w>>")
 
 lvim.builtin.which_key.mappings["b"] = false
 lvim.builtin.which_key.mappings["<space>"] = { "<cmd>lua require('telescope.builtin').git_files()<CR>", "Project files" }
@@ -13,6 +17,7 @@ lvim.builtin.which_key.mappings["b"] ={
 }
 lvim.builtin.which_key.mappings["ff"] = { "<cmd>lua require'telescope'.extensions.file_browser.file_browser{path='%:p:h'}<CR>", "File browser"}
 lvim.builtin.which_key.mappings["sP"] = { "<cmd>lua require'telescope'.extensions.project.project{}<CR>", "Projects"}
+lvim.builtin.which_key.mappings["dU"] = { "<cmd>lua require'dapui'.toggle()<CR>", "Toggle DapUI"}
 
 lvim.builtin.which_key.mappings["o"] ={
   name = "+Open",
@@ -29,8 +34,21 @@ lvim.builtin.which_key.mappings["c"] = {
       f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
       i = { "<cmd>lua vim.lsp.buf.implementation()<cr>", "Implementation" },
       d = { "<cmd>lua vim.lsp.buf.definition()<cr>", "Definition" },
-      D = { "<cmd>lua vim.lsp.buf.declaration()<cr>", "Declaration" },
+      D = { "<cmd>lua vim.lsp.buf.references()<cr>", "Declaration" },
       r = { "<cmd>lua vim.lsp.buf.rename()<cr>", "Rename" },
+    }
+lvim.builtin.which_key.mappings["w"] = {
+      name = "window",
+      s = { "<cmd>split<cr>", "Split window"},
+      v = { "<cmd>vsplit<cr>", "Split window vertically"},
+      w = { "<c-w>w", "Switch windows"},
+      d = { "<c-w>q", "Quit a window"},
+      ["-"] = {"<c-w>-", "Decrease height"},
+      ["+"] = {"<c-w>+", "Increase height"},
+      ["<lt>"] = { "<c-w><", "Decrease width"},
+      [">"] = { "<c-w>>", "Increase width"},
+      ["|"] = { "<c-w>|", "Max out the width"},
+      ["="] = { "<c-w>=", "Equally high and wide"},
     }
 
 lvim.builtin.dashboard.active = true
@@ -71,54 +89,15 @@ formatters.setup {
     filetypes = { "go" },
   },
 }
--- ---@usage setup a server -- see: https://www.lunarvim.org/languages/#overriding-the-default-configuration
--- local opts = {} -- check the lspconfig documentation for a list of all possible options
--- require("lvim.lsp.manager").setup("pylsp", opts)
 
--- -- you can set a custom on_attach function that will be used for all the language servers
--- -- See <https://github.com/neovim/nvim-lspconfig#keybindings-and-completion>
--- lvim.lsp.on_attach_callback = function(client, bufnr)
---   local function buf_set_option(...)
---     vim.api.nvim_buf_set_option(bufnr, ...)
---   end
---   --Enable completion triggered by <c-x><c-o>
---   buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
--- end
-
--- -- set a formatter, this will override the language server formatting capabilities (if it exists)
--- local formatters = require "lvim.lsp.null-ls.formatters"
--- formatters.setup {
---   { command = "black", filetypes = { "python" } },
---   { command = "isort", filetypes = { "python" } },
---   {
---     -- each formatter accepts a list of options identical to https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
---     command = "prettier",
---     ---@usage arguments to pass to the formatter
---     -- these cannot contain whitespaces, options such as `--line-width 80` become either `{'--line-width', '80'}` or `{'--line-width=80'}`
---     extra_args = { "--print-with", "100" },
---     ---@usage specify which filetypes to enable. By default a providers will attach to all the filetypes it supports.
---     filetypes = { "typescript", "typescriptreact" },
---   },
--- }
-
--- -- set additional linters
--- local linters = require "lvim.lsp.null-ls.linters"
--- linters.setup {
---   { command = "flake8", filetypes = { "python" } },
---   {
---     -- each linter accepts a list of options identical to https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
---     command = "shellcheck",
---     ---@usage arguments to pass to the formatter
---     -- these cannot contain whitespaces, options such as `--line-width 80` become either `{'--line-width', '80'}` or `{'--line-width=80'}`
---     extra_args = { "--severity", "warning" },
---   },
---   {
---     command = "codespell",
---     ---@usage specify which filetypes to enable. By default a providers will attach to all the filetypes it supports.
---     filetypes = { "javascript", "python" },
---   },
--- }
--- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
+-- set additional linters
+local linters = require "lvim.lsp.null-ls.linters"
+linters.setup {
+  {
+    command = "shellcheck",
+    extra_args = { "--severity", "warning" },
+  },
+}
 
 -- Additional Plugins
 lvim.plugins = {
@@ -127,6 +106,9 @@ lvim.plugins = {
     {"mfussenegger/nvim-jdtls"},
     {"tpope/vim-dadbod"},
     {"kristijanhusak/vim-dadbod-ui"},
+    {"buoto/gotests-vim"},
+    { "rcarriga/nvim-dap-ui", requires = {"mfussenegger/nvim-dap"} },
+    { "skywind3000/asynctasks.vim", requires = {"skywind3000/asyncrun.vim"} },
     {
       "windwp/nvim-spectre",
       event = "BufRead",
@@ -139,39 +121,9 @@ lvim.plugins = {
 require'telescope'.load_extension('project')
 require'telescope'.load_extension('file_browser')
 
-local config = {
-  cmd = {
-    'java',
-    '-Declipse.application=org.eclipse.jdt.ls.core.id1',
-    '-Dosgi.bundles.defaultStartLevel=4',
-    '-Declipse.product=org.eclipse.jdt.ls.core.product',
-    '-Dlog.protocol=true',
-    '-Dlog.level=ALL',
-    '-Xms1g',
-    '--add-modules=ALL-SYSTEM',
-    '--add-opens', 'java.base/java.util=ALL-UNNAMED',
-    '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
-    '-jar', '/home/wexder/.local/share/nvim/lsp_servers/jdtls/plugins/org.eclipse.equinox.launcher.gtk.linux.x86_64_1.2.400.v20211117-0650.jar',
-
-    '-configuration', '/home/wexder/.local/share/nvim/lsp_servers/jdtls/config_ss_linux',
-
-    '-data', '/home/wexder/development/java/workspace'
-  },
-
-  root_dir = require('jdtls.setup').find_root({'.git', 'mvnw', 'gradlew'}),
-  settings = {
-    java = {
-    }
-  },
-
-  init_options = {
-    bundles = {}
-  },
-}
-
-config['on_attach'] = function(client, bufnr)
-  require('jdtls').setup_dap({ hotcodereplace = 'auto' })
-end
+vim.cmd("let g:asyncrun_open = 6")
+vim.cmd("let g:asynctasks_term_pos = 'right'")
+vim.cmd("let g:asynctasks_term_cols = 60")
 
 local dap = require('dap')
 dap.configurations.java = {
@@ -187,7 +139,6 @@ dap.configurations.java = {
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
 lvim.autocommands.custom_groups = {
   { "BufWinEnter", "*.lua", "setlocal ts=8 sw=8" },
-  { "FileType", "*.java", "lua require('jdtls').start_or_attach(config)" },
 }
 
 vim.opt.relativenumber = true

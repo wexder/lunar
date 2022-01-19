@@ -14,10 +14,11 @@ local config = {
     '--add-opens', 'java.base/java.util=ALL-UNNAMED',
     '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
     '-javaagent:/home/wexder/.local/share/nvim/lsp_servers/jdtls/lombok.jar',
-    '-jar', '/home/wexder/.local/share/nvim/lsp_servers/jdtls/plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar',
+    '-jar', '/home/wexder/.local/share/nvim/lsp_servers/jdtls/plugins/org.eclipse.equinox.launcher.gtk.linux.x86_64_1.2.400.v20211117-0650.jar',
     '-configuration', '/home/wexder/.local/share/nvim/lsp_servers/jdtls/config_linux',
     '-data', workspace_dir
   },
+  root_dir = require('jdtls.setup').find_root({'.git', 'mvnw', 'gradlew'}),
   settings = {
     java = {
     }
