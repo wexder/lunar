@@ -13,7 +13,7 @@ vim.cmd("nnoremap ¬ <c-w>>")
 lvim.builtin.which_key.mappings["b"] = false
 lvim.builtin.which_key.mappings["<space>"] = { "<cmd>lua require('telescope.builtin').git_files()<CR>", "Project files" }
 lvim.builtin.which_key.mappings["b"] ={
-  k = { "<cmd>BufferClose<CR>", "Close buffer" }
+  k = { "<cmd>BufferKill<CR>", "Close buffer" }
 }
 lvim.builtin.which_key.mappings["ff"] = { "<cmd>lua require'telescope'.extensions.file_browser.file_browser{path='%:p:h'}<CR>", "File browser"}
 lvim.builtin.which_key.mappings["sP"] = { "<cmd>lua require'telescope'.extensions.project.project{}<CR>", "Projects"}
@@ -107,7 +107,13 @@ lvim.plugins = {
     {"tpope/vim-dadbod"},
     {"kristijanhusak/vim-dadbod-ui"},
     {"buoto/gotests-vim"},
-    { "rcarriga/nvim-dap-ui", requires = {"mfussenegger/nvim-dap"} },
+    { "rcarriga/nvim-dap-ui", requires = {"mfussenegger/nvim-dap"}, config = function ()
+           require("dapui").setup({
+                        sidebar = {
+                                position="right"
+                        }
+                })
+    end },
     { "skywind3000/asynctasks.vim", requires = {"skywind3000/asyncrun.vim"} },
     {
       "windwp/nvim-spectre",
@@ -115,7 +121,13 @@ lvim.plugins = {
       config = function()
         require("spectre").setup()
       end,
-    }
+    },
+    {"nvim-orgmode/orgmode", config = function()
+                require('orgmode').setup({
+                  org_agenda_files = {'~/org/*'},
+                  org_default_notes_file = '~/org/*',
+                })
+        end}
 }
 
 require'telescope'.load_extension('project')
@@ -135,6 +147,29 @@ dap.configurations.java = {
     port = 5005;
   },
 }
+
+
+local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+parser_config.org = {
+  install_info = {
+    url = 'https://github.com/milisims/tree-sitter-org',
+    revision = 'f110024d539e676f25b72b7c80b0fd43c34264ef',
+    files = {'src/parser.c', 'src/scanner.cc'},
+  },
+  filetype = 'org',
+}
+
+require'nvim-treesitter.configs'.setup {
+  -- If TS highlights are not enabled at all, or disabled via `disable` prop, highlighting will fallback to default Vim syntax highlighting
+  highlight = {
+    enable = true,
+    disable = {'org'}, -- Remove this to use TS highlighter for some of the highlights (Experimental)
+    additional_vim_regex_highlighting = {'org'}, -- Required since TS highlighter doesn't support all syntax features (conceal)
+  },
+  ensure_installed = {'org'}, -- Or run :TSUpdate org
+}
+  
+
 
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
 lvim.autocommands.custom_groups = {
