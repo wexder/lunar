@@ -1,7 +1,10 @@
 local M = {}
 lvim.log.level = "warn"
 lvim.format_on_save = true
+
+
 lvim.colorscheme = "onedarker"
+lvim.transparent_window = true
 
 lvim.leader = "space"
 vim.cmd("nnoremap . <Nop>")
@@ -51,7 +54,7 @@ lvim.builtin.which_key.mappings["w"] = {
       ["="] = { "<c-w>=", "Equally high and wide"},
     }
 
-lvim.builtin.dashboard.active = true
+lvim.builtin.alpha.dashboard.active = true
 lvim.builtin.notify.active = true
 lvim.builtin.terminal.active = true
 lvim.builtin.dap.active = true
@@ -88,6 +91,10 @@ formatters.setup {
     exe = "gofumpt",
     filetypes = { "go" },
   },
+  -- {
+  --   exe = "golines",
+  --   filetypes = { "go" },
+  -- },
 }
 
 -- set additional linters
@@ -103,7 +110,7 @@ linters.setup {
 lvim.plugins = {
     {"nvim-telescope/telescope-file-browser.nvim"},
     {"nvim-telescope/telescope-project.nvim"},
-    {"mfussenegger/nvim-jdtls"},
+    {"mfussenegger/nvim-jdtls", commit = "2cceff656f2bfac38da784f2cd4b202a64a2faf3"},
     {"tpope/vim-dadbod"},
     {"kristijanhusak/vim-dadbod-ui"},
     {"buoto/gotests-vim"},
@@ -153,7 +160,6 @@ local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.org = {
   install_info = {
     url = 'https://github.com/milisims/tree-sitter-org',
-    revision = 'f110024d539e676f25b72b7c80b0fd43c34264ef',
     files = {'src/parser.c', 'src/scanner.cc'},
   },
   filetype = 'org',
