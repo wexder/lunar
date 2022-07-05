@@ -6,6 +6,11 @@ lvim.format_on_save = true
 lvim.colorscheme = "onedarker"
 lvim.transparent_window = true
 
+local components = require("lvim.core.lualine.components")
+lvim.builtin.lualine.sections.lualine_y = {
+  components.location
+}
+
 lvim.leader = "space"
 vim.cmd("nnoremap . <Nop>")
 vim.cmd("nnoremap ∆ <c-w>-")
@@ -129,12 +134,9 @@ lvim.plugins = {
         require("spectre").setup()
       end,
     },
-    {"nvim-orgmode/orgmode", config = function()
-                require('orgmode').setup({
-                  org_agenda_files = {'~/org/*'},
-                  org_default_notes_file = '~/org/*',
-                })
-        end}
+    {"leoluz/nvim-dap-go", config = function ()
+      require('dap-go').setup()
+    end},
 }
 
 require'telescope'.load_extension('project')
@@ -155,31 +157,5 @@ dap.configurations.java = {
   },
 }
 
-
-local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
-parser_config.org = {
-  install_info = {
-    url = 'https://github.com/milisims/tree-sitter-org',
-    files = {'src/parser.c', 'src/scanner.cc'},
-  },
-  filetype = 'org',
-}
-
-require'nvim-treesitter.configs'.setup {
-  -- If TS highlights are not enabled at all, or disabled via `disable` prop, highlighting will fallback to default Vim syntax highlighting
-  highlight = {
-    enable = true,
-    disable = {'org'}, -- Remove this to use TS highlighter for some of the highlights (Experimental)
-    additional_vim_regex_highlighting = {'org'}, -- Required since TS highlighter doesn't support all syntax features (conceal)
-  },
-  ensure_installed = {'org'}, -- Or run :TSUpdate org
-}
-  
-
-
--- Autocommands (https://neovim.io/doc/user/autocmd.html)
-lvim.autocommands.custom_groups = {
-  { "BufWinEnter", "*.lua", "setlocal ts=8 sw=8" },
-}
 
 vim.opt.relativenumber = true
