@@ -59,12 +59,12 @@ lvim.builtin.which_key.mappings["w"] = {
       ["="] = { "<c-w>=", "Equally high and wide"},
     }
 
-lvim.builtin.alpha.dashboard.active = true
+lvim.builtin.alpha.active = true
+lvim.builtin.alpha.mode = "dashboard"
 lvim.builtin.notify.active = true
 lvim.builtin.terminal.active = true
 lvim.builtin.dap.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
-lvim.builtin.nvimtree.show_icons.git = 0
 
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
@@ -136,7 +136,7 @@ lvim.plugins = {
     },
     {"leoluz/nvim-dap-go", config = function ()
       require('dap-go').setup()
-    end},
+    end}
 }
 
 require'telescope'.load_extension('project')
@@ -146,7 +146,12 @@ vim.cmd("let g:asyncrun_open = 6")
 vim.cmd("let g:asynctasks_term_pos = 'right'")
 vim.cmd("let g:asynctasks_term_cols = 60")
 
-local dap = require('dap')
+require("nvim-lsp-installer").setup {
+    ensure_installed = { "jdtls@1.12.0-202206011637" },
+    automatic_installation = { exclude = { "jdtls" } }
+}
+
+lvim.builtin.dap.on_config_done = function(dap)
 dap.configurations.java = {
   {
     type = 'java';
@@ -156,6 +161,20 @@ dap.configurations.java = {
     port = 5005;
   },
 }
+end
 
+
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = { "*.json", "*.jsonc" },
+  -- enable wrap mode for json files only
+  command = "setlocal wrap",
+})
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "zsh",
+  callback = function()
+    -- let treesitter use bash highlight for zsh files as well
+    require("nvim-treesitter.highlight").attach(0, "bash")
+  end,
+})
 
 vim.opt.relativenumber = true
