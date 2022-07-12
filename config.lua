@@ -71,6 +71,7 @@ lvim.builtin.treesitter.ensure_installed = {
   "bash",
   "c",
   "javascript",
+  "java",
   "json",
   "lua",
   "python",
@@ -115,7 +116,6 @@ linters.setup {
 lvim.plugins = {
     {"nvim-telescope/telescope-file-browser.nvim"},
     {"nvim-telescope/telescope-project.nvim"},
-    {"mfussenegger/nvim-jdtls", commit = "2cceff656f2bfac38da784f2cd4b202a64a2faf3"},
     {"tpope/vim-dadbod"},
     {"kristijanhusak/vim-dadbod-ui"},
     {"buoto/gotests-vim"},
@@ -145,6 +145,8 @@ require'telescope'.load_extension('file_browser')
 vim.cmd("let g:asyncrun_open = 6")
 vim.cmd("let g:asynctasks_term_pos = 'right'")
 vim.cmd("let g:asynctasks_term_cols = 60")
+
+lvim.lsp.automatic_servers_installation = false
 
 require("nvim-lsp-installer").setup {
     ensure_installed = { "jdtls@1.12.0-202206011637" },
